@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class QTEWatering : MonoBehaviour
 {
     [Header("UI References")]
+    public GameObject qteUIRoot;     // NEW: root panel to toggle
     public Slider progressBar;       // watering bar (0–1)
     public RectTransform marker;     // moving marker
     public RectTransform targetZone; // success zone
@@ -14,23 +15,49 @@ public class QTEWatering : MonoBehaviour
     public float hitRange = 30f;
     public float progressPerHit = 0.1f;
     public float penaltyPerMiss = 0.05f;
+    public bool autoCloseOnComplete = true;   // NEW
 
     [Header("Tree")]
-    public TreeGrowth tree; // tree here
+    public TreeGrowth tree; // target tree
 
     float direction = 1f;
+    bool isActive;          // NEW
 
     void Start()
     {
         ResetTargetZone();
         if (progressBar) progressBar.value = 0f;
+        SetActive(false);   // start hidden
+    }
+
+    public void StartQTE(TreeGrowth treeRef = null)   // NEW
+    {
+        if (treeRef) tree = treeRef;
+        ResetTargetZone();
+        SetActive(true);
+    }
+
+    public void StopQTE(bool resetBar = false)        // NEW
+    {
+        SetActive(false);
+        if (resetBar && progressBar) progressBar.value = 0f;
+    }
+
+    public void SetActive(bool value)                 // NEW
+    {
+        isActive = value;
+        if (qteUIRoot) qteUIRoot.SetActive(value);
+        enabled = value; // optional; keeps Update off when inactive
     }
 
     void Update()
     {
+        if (!isActive) return;
+
         MoveMarker();
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Left Mouse Button to attempt
+        if (Input.GetMouseButtonDown(0))
         {
             CheckHit();
         }
@@ -53,21 +80,21 @@ public class QTEWatering : MonoBehaviour
         {
             // success
             progressBar.value += progressPerHit;
-            tree.SetProgress(progressBar.value); // sync tree
+            if (tree) tree.SetProgress(progressBar.value);
 
             ResetTargetZone();
 
             if (progressBar.value >= 1f)
             {
-                tree.Grow();
-                Debug.Log("Tree fully watered!");
+                if (tree) tree.Grow();
+                if (autoCloseOnComplete) StopQTE(false);
             }
         }
         else
         {
             // fail
             progressBar.value = Mathf.Max(0f, progressBar.value - penaltyPerMiss);
-            tree.SetProgress(progressBar.value);
+            if (tree) tree.SetProgress(progressBar.value);
         }
     }
 

@@ -1,17 +1,23 @@
 using UnityEngine;
 
+public enum ItemKind { Generic, WateringCan }   // NEW
+
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class PickupItem : MonoBehaviour, IInteractable
 {
+    [Header("Item")]
+    public ItemKind itemKind = ItemKind.Generic;  // NEW
+
     [Header("Carry Settings")]
     public float holdDistance = 2.0f;
-    public float followStrength = 20f;        
+    public float followStrength = 20f;
     public float maxCarrySpeed = 10f;
     public float throwForce = 8f;
 
     Rigidbody rb;
     bool isCarried;
-    Transform carryAnchor; // where the item follows (from PlayerInteractor)
+    public bool IsCarried => isCarried;          // NEW
+    Transform carryAnchor;
 
     void Awake()
     {
@@ -25,19 +31,16 @@ public class PickupItem : MonoBehaviour, IInteractable
         else Drop();
     }
 
-    public void SetTargeted(bool targeted) { /* optional: show outline / UI */ }
+    public void SetTargeted(bool targeted) { /* optional */ }
 
     void FixedUpdate()
     {
         if (!isCarried || !carryAnchor) return;
 
-        // Smooth physics follow toward the anchor point
         Vector3 toTarget = carryAnchor.position - rb.worldCenterOfMass;
-        Vector3 desiredVel = toTarget * followStrength;
-        desiredVel = Vector3.ClampMagnitude(desiredVel, maxCarrySpeed);
+        Vector3 desiredVel = Vector3.ClampMagnitude(toTarget * followStrength, maxCarrySpeed);
         rb.velocity = desiredVel;
 
-        // Optional damping for rotation
         Quaternion targetRot = carryAnchor.rotation;
         Quaternion delta = targetRot * Quaternion.Inverse(rb.rotation);
         delta.ToAngleAxis(out float angle, out Vector3 axis);

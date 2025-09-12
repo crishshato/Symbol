@@ -14,6 +14,8 @@ public class PlayerInteractor : MonoBehaviour
     IInteractable current;
     PickupItem carried;
 
+    public PickupItem CarriedItem => carried;   // NEW
+
     Transform carryAnchor; // lazily created
 
     void Update()
