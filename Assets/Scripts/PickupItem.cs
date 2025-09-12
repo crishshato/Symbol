@@ -5,7 +5,7 @@ public class PickupItem : MonoBehaviour, IInteractable
 {
     [Header("Carry Settings")]
     public float holdDistance = 2.0f;
-    public float followStrength = 20f;        // higher = snappier follow
+    public float followStrength = 20f;        
     public float maxCarrySpeed = 10f;
     public float throwForce = 8f;
 
