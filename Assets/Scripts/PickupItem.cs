@@ -1,13 +1,8 @@
 using UnityEngine;
 
-public enum ItemKind { Generic, WateringCan }   // NEW
-
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class PickupItem : MonoBehaviour, IInteractable
 {
-    [Header("Item")]
-    public ItemKind itemKind = ItemKind.Generic;  // NEW
-
     [Header("Carry Settings")]
     public float holdDistance = 2.0f;
     public float followStrength = 20f;
@@ -16,7 +11,7 @@ public class PickupItem : MonoBehaviour, IInteractable
 
     Rigidbody rb;
     bool isCarried;
-    public bool IsCarried => isCarried;          // NEW
+    public bool IsCarried => isCarried;
     Transform carryAnchor;
 
     void Awake()
@@ -31,7 +26,7 @@ public class PickupItem : MonoBehaviour, IInteractable
         else Drop();
     }
 
-    public void SetTargeted(bool targeted) { /* optional */ }
+    public void SetTargeted(bool targeted) { }
 
     void FixedUpdate()
     {
@@ -63,6 +58,7 @@ public class PickupItem : MonoBehaviour, IInteractable
         carryAnchor = null;
         rb.useGravity = true;
         rb.angularVelocity = Vector3.zero;
+        rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // reset
     }
 
     public void Throw(Vector3 dir)
