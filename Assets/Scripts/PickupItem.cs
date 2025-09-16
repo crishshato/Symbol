@@ -14,6 +14,11 @@ public class PickupItem : MonoBehaviour, IInteractable
     public bool IsCarried => isCarried;
     Transform carryAnchor;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip pickupSfx;
+    public AudioClip dropSfx;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -50,6 +55,9 @@ public class PickupItem : MonoBehaviour, IInteractable
         carryAnchor = interactor.EnsureCarryAnchor(holdDistance);
         rb.useGravity = false;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+        if (audioSource && pickupSfx)
+            audioSource.PlayOneShot(pickupSfx);
     }
 
     public void Drop()
@@ -59,6 +67,9 @@ public class PickupItem : MonoBehaviour, IInteractable
         rb.useGravity = true;
         rb.angularVelocity = Vector3.zero;
         rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // reset
+
+        if (audioSource && dropSfx)
+            audioSource.PlayOneShot(dropSfx);
     }
 
     public void Throw(Vector3 dir)
