@@ -10,8 +10,20 @@ public class NarrativeTextController : MonoBehaviour
     public float charDelay = 0.02f;
     public float fadeTime = 0.25f;
 
-    [Header("Auto Advance")]
-    public bool autoAdvance = true;
+    [Header("Simple Timing")]
+    [Tooltip("Base seconds each line stays (before postGap).")]
+    public float holdBase = 0.8f;
+    [Tooltip("Extra seconds per character (reading time).")]
+    public float holdPerChar = 0.02f;
+    [Tooltip("Keep line up at least as long as the voice clip (if provided).")]
+    public bool useVoiceLength = true;
+    [Tooltip("Small extra pause between lines.")]
+    public float postGap = 0.10f;
+    [Tooltip("Clamp final hold seconds (safety).")]
+    public float minHold = 0.50f, maxHold = 12f;
+
+    [Header("Legacy (optional)")]
+    public bool autoAdvance = false;      // off by default
     public float autoAdvanceDelay = 2f;
 
     [Header("Behavior")]
@@ -23,7 +35,6 @@ public class NarrativeTextController : MonoBehaviour
     List<string> lines;
     int index = -1;
     Coroutine routine;
-    bool isVisible;
 
     void Awake()
     {
@@ -33,7 +44,18 @@ public class NarrativeTextController : MonoBehaviour
         if (tmp) { tmp.text = ""; tmp.maxVisibleCharacters = 0; }
     }
 
-    // Call before Show() when you want a dialogue
+    // ---------- Simple timing API ----------
+    // voiceSeconds < 0 if unknown / none
+    public float ComputeHoldSeconds(int charCount, float voiceSeconds = -1f)
+    {
+        float read = Mathf.Max(0f, holdBase + charCount * holdPerChar);
+        if (useVoiceLength && voiceSeconds >= 0f)
+            read = Mathf.Max(read, voiceSeconds);
+
+        return Mathf.Clamp(read + Mathf.Max(0f, postGap), minHold, maxHold);
+    }
+
+    // ---------- Public controls ----------
     public void SetLines(IEnumerable<string> newLines)
     {
         lines = new List<string>(newLines ?? System.Array.Empty<string>());
@@ -70,55 +92,43 @@ public class NarrativeTextController : MonoBehaviour
 
     public bool NextLine()
     {
-        string next;
-        if (lines != null && lines.Count > 0)
-        {
-            index++;
-            if (index >= lines.Count) return false;
-            next = lines[index];
-        }
-        else
-        {
-            return false;
-        }
+        if (lines == null || lines.Count == 0) return false;
+        index++;
+        if (index >= lines.Count) return false;
 
+        string next = lines[index];
         if (routine != null) StopCoroutine(routine);
-        routine = StartCoroutine(TypeLine(next));
+        routine = StartCoroutine(TypeLine(next, -1f));
         return true;
     }
 
+    // ---------- Internals ----------
     IEnumerator ShowRoutine()
     {
         yield return StartCoroutine(Fade(1f));
-        isVisible = true;
-
-        if (!NextLine())
-        {
-            ClearNow();
-        }
+        if (!NextLine()) ClearNow();
     }
 
     IEnumerator FadeOutRoutine()
     {
-        isVisible = false;
         yield return StartCoroutine(Fade(0f));
         if (clearOnHide) ClearNow();
     }
 
     IEnumerator HideAndClearRoutine()
     {
-        isVisible = false;
         yield return StartCoroutine(Fade(0f));
         ClearNow();
     }
 
-    IEnumerator TypeLine(string text)
+    // voiceSeconds: pass clip.length if you have it, else -1
+    IEnumerator TypeLine(string text, float voiceSeconds)
     {
         if (!tmp) yield break;
 
         tmp.text = text;
         tmp.maxVisibleCharacters = 0;
-        yield return null;
+        yield return null; // let TMP layout
 
         int total = tmp.textInfo.characterCount;
         for (int i = 0; i <= total; i++)
@@ -127,9 +137,11 @@ public class NarrativeTextController : MonoBehaviour
             yield return new WaitForSeconds(charDelay);
         }
 
-        if (autoAdvance)
+        // Legacy auto-advance (optional)
+        if (autoAdvance && lines != null && index >= 0 && index < lines.Count - 1)
         {
-            yield return new WaitForSeconds(autoAdvanceDelay);
+            float hold = Mathf.Max(autoAdvanceDelay, ComputeHoldSeconds(total, voiceSeconds));
+            yield return new WaitForSeconds(hold);
             if (NextLine()) yield break;
         }
     }

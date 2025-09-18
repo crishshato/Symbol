@@ -1,0 +1,11 @@
+Model Information:
+* title:	Seed
+* source:	https://sketchfab.com/3d-models/seed-0f58810ed99149549d17a4de767e2d09
+* author:	gavinpgamer1 (https://sketchfab.com/gavinpgamer1)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Seed" (https://sketchfab.com/3d-models/seed-0f58810ed99149549d17a4de767e2d09) by gavinpgamer1 (https://sketchfab.com/gavinpgamer1) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

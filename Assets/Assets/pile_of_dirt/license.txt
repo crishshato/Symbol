@@ -1,0 +1,11 @@
+Model Information:
+* title:	Pile of Dirt
+* source:	https://sketchfab.com/3d-models/pile-of-dirt-a7c656446cb543d892edc127dec8abf7
+* author:	vincurek.f (https://sketchfab.com/vincurek.f)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Pile of Dirt" (https://sketchfab.com/3d-models/pile-of-dirt-a7c656446cb543d892edc127dec8abf7) by vincurek.f (https://sketchfab.com/vincurek.f) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

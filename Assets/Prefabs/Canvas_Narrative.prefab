@@ -276,6 +276,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f540b609f6fa53645bf47b14ba3d493a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fullText: The end is near
   charDelay: 0.02
   fadeTime: 0.25
+  autoAdvance: 1
+  autoAdvanceDelay: 2
+  clearOnHide: 1
